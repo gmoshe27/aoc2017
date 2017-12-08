@@ -55,7 +55,7 @@ module Question2 =
 
     let drawSpiral debug input =
 
-        // initialize the matrix with extra padding for our convolution filter
+        // initialize the matrix with padding around the borders for simplified adding
         let matrixSize = findMatrixSize input
         let size = matrixSize + 2
         let midpoint = size / 2
@@ -64,7 +64,7 @@ module Question2 =
         // start with 1 in the center
         arr.[midpoint, midpoint] <- 1
 
-        // it's not really convolution, but close enough...
+        // start spiraling
         let rec loop i j steps square move =
             let ki, kj =
                 match move with
@@ -74,8 +74,8 @@ module Question2 =
                 | Down -> i + 1, j
 
             if debug then printfn "addSpiral: %d, %d" ki kj
-
             arr.[ki, kj] <- arr |> addSpiral ki kj
+
             if arr.[ki, kj] > input then
                 arr.[ki, kj]
             else
