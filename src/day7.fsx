@@ -1,17 +1,8 @@
 open System.IO
 open System.Text.RegularExpressions
 
-type Name = string
-type Weight = int
-
-// This is an n-ary tree
-type Node =
-    | Disc of Name * Weight
-    | Node of Node []
-   
-
 module Question1 =
-    let debug = false
+    let debug = true
     let path = if debug then @"..\input\day7-q1-example.txt" else @"..\input\day7-q1.txt"
     let input = File.ReadAllLines path
     let listofBranches, listOfLeaves = input |> Array.partition (fun s -> s.Contains "->")
@@ -50,8 +41,45 @@ module Question1 =
     let root =
         distinctNode
         |> List.ofSeq
-        |> function | [] -> "" | h::t -> h
+        |> List.head
     
     let answer () = root
 
 Question1.answer () |> printfn "Question 1: %s"
+
+module Question2 =
+    // Given that we parse everything in question1, let's re-use that.
+
+    let leaves = Question1.leaves
+    let branches = Question1.branches |> Array.map fst
+    let branchNodes = Question1.branches |> Array.map (fun (root, nodes) -> fst root, nodes) |> Map.ofArray
+
+    let map =
+        leaves
+        |> Array.append branches
+        |> Map.ofArray
+
+    let findUnbalancedDifference () =
+        let root = Question1.root
+        let children = branchNodes.[root] |> List.ofArray
+
+        let rec sum acc nodes =
+            match nodes with
+            | [] -> acc
+            | node::t ->
+                let keyExists = branchNodes |> Map.containsKey node
+                match keyExists with
+                | true ->
+                    let cs = branchNodes.[node] |> List.ofArray
+                    let list = t @ cs
+                    sum acc list
+                | false -> sum (acc + map.[node]) t
+
+        let sums = children |> List.map (fun child -> map.[child] + (sum 0 [child]) )
+
+        // then figure out the difference
+        sums
+
+    let answer = findUnbalancedDifference
+
+Question2.answer () |> printfn "Question 2: %A"
