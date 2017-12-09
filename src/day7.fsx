@@ -71,14 +71,16 @@ module Question2 =
                 match keyExists with
                 | true ->
                     let cs = branchNodes.[node] |> List.ofArray
+                    let summed = cs |> List.sumBy (fun c -> map.[c])
                     let list = t @ cs
-                    sum acc list
-                | false -> sum (acc + map.[node]) t
+                    sum (acc + summed) list
+                | false -> sum acc t
 
         let sums = children |> List.map (fun child -> map.[child] + (sum 0 [child]) )
 
-        // then figure out the difference
-        sums
+        // Convert the results to a set to reduce it to two group, and then get the difference
+        let difference = sums |> Set.ofList |> List.ofSeq |> List.fold (fun acc x -> x - acc |> abs) 0
+        difference
 
     let answer = findUnbalancedDifference
 
