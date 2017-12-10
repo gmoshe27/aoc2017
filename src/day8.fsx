@@ -25,6 +25,9 @@ module Question1 =
 
     let registers = Dictionary<string, int>()
 
+    // I tried my best to avoid the mutable value, but it's the best way to represent memory
+    let mutable max = 0
+
     let getValue register (registers:Dictionary<string,int>) =
         // TryGetValue will return 0 if the key does not exist, otherwise, it will return
         // the value found int the dictionary
@@ -68,13 +71,17 @@ module Question1 =
             Right = b |> int
         }
 
+    // For Question 2
+    let updateMax value = if value > max then value else max
+
     let evaluate e = if e.Condition e.Left e.Right then Some e else None
     let execute expression =
         match expression with
         | Some e ->
             let rvalue = registers |> getValue e.Register
-            let newState = e.Cmd rvalue e.Value
-            registers |> setValue e.Register newState
+            let value = e.Cmd rvalue e.Value
+            registers |> setValue e.Register value
+            max <- updateMax value
         | None -> ()
 
     // iterate through the input stream, updating the dictionary as we go along.
@@ -88,12 +95,14 @@ module Question1 =
     let toSeq dictionary = 
         (dictionary :> seq<_>)
         |> Seq.map (|KeyValue|)
-    let answer() =
+    let answer () =
         executeCommands ()
         let max = registers |> toSeq |> Seq.maxBy snd
         snd max
 
 Question1.answer () |> printfn "Question 1: %d"
 
-// For question 2, I modified the dictionary to have an initial "max"
-// value to keep track of the biggest value at any one
+module Question2 =
+    let answer() = Question1.max
+
+Question2.answer () |> printfn "Question 2: %d"
