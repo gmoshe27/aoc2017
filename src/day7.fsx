@@ -1,8 +1,9 @@
 open System.IO
 open System.Text.RegularExpressions
+open System.Security.AccessControl
 
 module Question1 =
-    let debug = true
+    let debug = false
     let path = if debug then @"..\input\day7-q1-example.txt" else @"..\input\day7-q1.txt"
     let input = File.ReadAllLines path
     let listofBranches, listOfLeaves = input |> Array.partition (fun s -> s.Contains "->")
@@ -60,9 +61,6 @@ module Question2 =
         |> Map.ofArray
 
     let findUnbalancedDifference () =
-        let root = Question1.root
-        let children = branchNodes.[root] |> List.ofArray
-
         let rec sum acc nodes =
             match nodes with
             | [] -> acc
@@ -71,17 +69,38 @@ module Question2 =
                 match keyExists with
                 | true ->
                     let cs = branchNodes.[node] |> List.ofArray
-                    let summed = cs |> List.sumBy (fun c -> map.[c])
+                    let total = cs |> List.sumBy (fun c -> map.[c])
                     let list = t @ cs
-                    sum (acc + summed) list
+                    sum (acc + total) list
                 | false -> sum acc t
 
-        let sums = children |> List.map (fun child -> map.[child] + (sum 0 [child]) )
+        // get the root's children, and sum up the trees and the child node weights
+        let root = Question1.root
+        let children = branchNodes.[root] |> List.ofArray
+        let sums = children |> List.map ( fun child -> map.[child] + (sum 0 [child]) )
 
-        // Convert the results to a set to reduce it to two group, and then get the difference
-        let difference = sums |> Set.ofList |> List.ofSeq |> List.fold (fun acc x -> x - acc |> abs) 0
-        difference
+        // find the outlier (unbalanced value) in the result
+        let outlierIndex =
+            sums
+            |> List.countBy id
+            |> List.findIndex (fun count -> snd count = 1 )
+        
+        let unbalanced = sums |> List.item outlierIndex
+        let balanced =  List.item ((outlierIndex + 1) % sums.Length) sums
+
+        printfn "unbalanced: %A, balanced = %A" unbalanced balanced
+        printfn "children = %A" children // (children |> List.map (fun x -> map.[x]))
+        printfn "sums = %A" sums
+
+        let difference = unbalanced - balanced
+        let program = children |> List.item outlierIndex
+        let weight = map.[program]
+
+        // if our unbalanced program weighs more than our balanced programs, then subtract the difference
+        printfn "difference = %d, weight = %d" difference weight
+        if difference > 0 then weight - difference else weight + difference
 
     let answer = findUnbalancedDifference
 
-Question2.answer () |> printfn "Question 2: %A"
+//Question2.answer () |> printfn "Question 2: %A"
+// Question 2 is unfinished. 
