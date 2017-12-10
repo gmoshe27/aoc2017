@@ -81,13 +81,15 @@ module Question1 =
     // initially I thought that about replacing the dictionary with an F# map,
     // it overly complicates things, and this question behaves more like it is
     // modifying memory
-    input |> Array.iter (parse >> evaluate >> execute)
+    let executeCommands () =
+        input |> Array.iter (parse >> evaluate >> execute)
 
     // http://theburningmonk.com/2012/08/f-converting-a-c-dictionary-to-a-map/
     let toSeq dictionary = 
         (dictionary :> seq<_>)
         |> Seq.map (|KeyValue|)
     let answer() =
+        executeCommands ()
         let max = registers |> toSeq |> Seq.maxBy snd
         snd max
 
