@@ -10,7 +10,7 @@ Solutions in F# for [Advent of Code 2017](http://adventofcode.com/2017)
 * Day 6 - Solution 1 + Solution 2
 * Day 7 - Solution 1 - Skipped
 * Day 8 - Solution 1 + Solution 2
-* Day 9 - Solution 1
+* Day 9 - Solution 1 + Solution 2
 * Day 10
 * Day 11
 * Day 12
