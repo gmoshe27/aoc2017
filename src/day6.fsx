@@ -2,8 +2,7 @@ open System.IO
 
 module Question1 =
     let debug = false
-    let input = File.ReadAllLines @"..\input\day6-q1.txt"
-    // let memory = input.[0].Split('\t') |> Array.map int // if debug then [|0; 2; 7; 0|] else input.[0].Split('\t') |> Array.map int
+    let input = File.ReadAllLines @"..\input\day6.txt"
     let memory = if debug then [|0; 2; 7; 0|] else input.[0].Split('\t') |> Array.map int
     let len = memory.Length
 

@@ -14,7 +14,7 @@ type Expression =
 
 module Question1 =
     let debug = false
-    let data = if debug then @"..\input\day8-sample.txt" else @"..\input\day8-q1.txt"
+    let data = if debug then @"..\input\day8-sample.txt" else @"..\input\day8.txt"
     let input = File.ReadAllLines data
 
     let regex = Regex @"(?<register>.*) (?<cmd>(inc|dec)) (?<cmdvalue>.*) if (?<a>.*) (?<condition>.*) (?<b>.*)$"

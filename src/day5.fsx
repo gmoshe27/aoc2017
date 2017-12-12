@@ -3,7 +3,7 @@ open System.IO
 module Question1 =
     let debug = false
     let testInput = [| 0; 3; 0; 1; -3 |]
-    let input = File.ReadAllLines @"..\input\day5-q1.txt"
+    let input = File.ReadAllLines @"..\input\day5.txt"
 
     let rec execute step total (input:int []) =
         let curr = input.[step]
@@ -26,7 +26,7 @@ Question1.answer () |> printfn "Question 1: %d"
 module Question2 =
     let debug = true
     let testInput = [| 0; 3; 0; 1; -3 |]
-    let input = File.ReadAllLines @"..\input\day5-q1.txt"
+    let input = File.ReadAllLines @"..\input\day5.txt"
 
     let rec execute step total (input:int []) =
         let curr = input.[step]

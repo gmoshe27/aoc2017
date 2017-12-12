@@ -1,7 +1,7 @@
 open System.IO
 
 module Question1 =
-    let input = File.ReadLines @"..\input\day4-q1.txt"
+    let input = File.ReadLines @"..\input\day4.txt"
 
     let isValidPassword debug (password:string) =
         let phrases = password.Split(' ')
@@ -24,7 +24,7 @@ module Question1 =
 Question1.answer false |> printfn "Total Valid Passwords Q1 = %d"
 
 module Question2 =
-    let input = File.ReadLines @"..\input\day4-q1.txt"
+    let input = File.ReadLines @"..\input\day4.txt"
 
     let isValidPassword debug (password:string) =
         let phrases = password.Split(' ')

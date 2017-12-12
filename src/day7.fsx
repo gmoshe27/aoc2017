@@ -4,7 +4,7 @@ open System.Security.AccessControl
 
 module Question1 =
     let debug = false
-    let path = if debug then @"..\input\day7-q1-example.txt" else @"..\input\day7-q1.txt"
+    let path = if debug then @"..\input\day7-sample.txt" else @"..\input\day7.txt"
     let input = File.ReadAllLines path
     let listofBranches, listOfLeaves = input |> Array.partition (fun s -> s.Contains "->")
 

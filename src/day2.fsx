@@ -1,7 +1,7 @@
 open System.IO
 
 module Question1 =
-    let input = File.ReadLines @"..\input\day2-q1.txt"
+    let input = File.ReadLines @"..\input\day2.txt"
 
     let orderedList =
         input
