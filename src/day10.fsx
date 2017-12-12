@@ -46,11 +46,26 @@ module Question1 =
 
 Question1.answer () |> printfn "%A"
 
-// module Question2 =
-//     let postfix = [17; 31; 73; 47; 23]
+module Question2 =
+    let debug = true
+    let postfix = [|17; 31; 73; 47; 23|]
+    let input =
+        if debug then
+            let examples = [""; "AoC 2017"; "1,2,3"; "1,2,4"]
+            examples.[2]
+        else
+            "94,84,0,79,2,27,81,1,123,93,218,23,103,255,254,243"
+    
+    let length =
+        let toAsciiBytes (input:string) =
+            input |> Seq.map (System.Convert.ToByte >> int ) |> Array.ofSeq
+        Array.append (toAsciiBytes input) postfix
 
-//     let rounds = 64
+    let rounds = 64
 
-//     let sparseHash = ()
-//     let denseHash = ()
+    let sparseHash = ()
+    let denseHash = ()
+    let knotHash = ()
 
+
+Question2.length |> printfn "%A"
