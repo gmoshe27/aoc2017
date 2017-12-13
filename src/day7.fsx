@@ -1,6 +1,5 @@
 open System.IO
 open System.Text.RegularExpressions
-open System.Security.AccessControl
 
 module Question1 =
     let debug = false
@@ -50,7 +49,7 @@ Question1.answer () |> printfn "Question 1: %s"
 
 module Question2 =
     // Given that we parse everything in question1, let's re-use that.
-
+    let debug = true
     let leaves = Question1.leaves
     let branches = Question1.branches |> Array.map fst
     let branchNodes = Question1.branches |> Array.map (fun (root, nodes) -> fst root, nodes) |> Map.ofArray
@@ -60,47 +59,54 @@ module Question2 =
         |> Array.append branches
         |> Map.ofArray
 
-    let findUnbalancedDifference () =
-        let rec sum acc nodes =
-            match nodes with
-            | [] -> acc
-            | node::t ->
-                let keyExists = branchNodes |> Map.containsKey node
-                match keyExists with
-                | true ->
-                    let cs = branchNodes.[node] |> List.ofArray
-                    let total = cs |> List.sumBy (fun c -> map.[c])
-                    let list = t @ cs
-                    sum (acc + total) list
-                | false -> sum acc t
-
+    let rec sum acc nodes =
+        match nodes with
+        | [] -> acc
+        | node::t ->
+            let keyExists = branchNodes |> Map.containsKey node
+            match keyExists with
+            | true ->
+                let cs = branchNodes.[node] |> List.ofArray
+                let total = cs |> List.sumBy (fun c -> map.[c])
+                let list = t @ cs
+                sum (acc + total) list
+            | false -> sum acc t
+    
+    // I have to be honest, this question took much longer for me to figure out than it should have
+    let rec findUnbalancedDifference balanceWeight node =
         // get the root's children, and sum up the trees and the child node weights
-        let root = Question1.root
-        let children = branchNodes.[root] |> List.ofArray
-        let sums = children |> List.map ( fun child -> map.[child] + (sum 0 [child]) )
+        let children = branchNodes.[node]
+        let sums = children |> Array.map ( fun child -> map.[child] + (sum 0 [child]) )
 
-        // find the outlier (unbalanced value) in the result
-        let outlierIndex =
+        if debug then
+            printfn "node=%s balanceWeight=%d" node balanceWeight
+            printfn "children=%A | sums=%A | " children sums
+
+        // singling out the distinct item in the group and getting the index was tough,
+        // until my brain started working again and I remembered that I could filter a sequence
+        let distinct =
             sums
-            |> List.countBy id
-            |> List.findIndex (fun count -> snd count = 1 )
-        
-        let unbalanced = sums |> List.item outlierIndex
-        let balanced =  List.item ((outlierIndex + 1) % sums.Length) sums
+            |> Array.mapi (fun i s -> i, s)
+            |> Array.groupBy snd
+            |> Array.filter (fun (_, group) -> group.Length = 1)
 
-        printfn "unbalanced: %A, balanced = %A" unbalanced balanced
-        printfn "children = %A" children // (children |> List.map (fun x -> map.[x]))
-        printfn "sums = %A" sums
+        if debug then printfn "distinct = %A" distinct
+        match distinct with
+        | [||] -> node, balanceWeight
+        | dnode ->
+            let idx, value = dnode |> Array.head |> snd |> Array.head
+            let balancedIdx = (idx + 1) % sums.Length
+            let diff = sums.[balancedIdx] - value
+            let nodeValue = map.[ children.[idx] ]
+            let bw = nodeValue + diff
+            if debug then
+                printfn "node=%s value=%d" children.[idx] map.[ children.[idx] ]
+                printfn "idx=%d balancedIdx=%d diff=%d bw=%d" idx balancedIdx diff bw
 
-        let difference = unbalanced - balanced
-        let program = children |> List.item outlierIndex
-        let weight = map.[program]
+            findUnbalancedDifference bw children.[idx]
 
-        // if our unbalanced program weighs more than our balanced programs, then subtract the difference
-        printfn "difference = %d, weight = %d" difference weight
-        if difference > 0 then weight - difference else weight + difference
+    let answer () =
+        let node, difference = findUnbalancedDifference 0 Question1.root
+        node, difference
 
-    let answer = findUnbalancedDifference
-
-//Question2.answer () |> printfn "Question 2: %A"
-// Question 2 is unfinished. 
+Question2.answer () |> printfn "Question 2: %A"

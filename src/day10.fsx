@@ -47,25 +47,45 @@ module Question1 =
 Question1.answer () |> printfn "%A"
 
 module Question2 =
-    let debug = true
+    let debug = false
     let postfix = [|17; 31; 73; 47; 23|]
-    let input =
+    let data =
         if debug then
             let examples = [""; "AoC 2017"; "1,2,3"; "1,2,4"]
-            examples.[2]
+            examples.[0]
         else
             "94,84,0,79,2,27,81,1,123,93,218,23,103,255,254,243"
     
-    let length =
+    let rounds = 64
+    let input = [|0..255|]
+    let lengths =
         let toAsciiBytes (input:string) =
             input |> Seq.map (System.Convert.ToByte >> int ) |> Array.ofSeq
-        Array.append (toAsciiBytes input) postfix
+        Array.append (toAsciiBytes data) postfix
 
-    let rounds = 64
+    let computeSparseHash input =
+        if debug then printfn "input = %A" input
+        let _, _, sparseHash =
+            [1..rounds]
+            |> List.fold ( fun (pos, skip, arr) i ->
+                // the hash function returns (pos, skip, arr), which can
+                // be recursively fed back into the top-level fold for
+                // the total number of rounds
+                lengths |> Array.fold Question1.hash (pos, skip, arr) )
+                (0, 0, input)
+        sparseHash
 
-    let sparseHash = ()
-    let denseHash = ()
-    let knotHash = ()
+    let computeDenseHash sparseHash =
+        if debug then printfn "sparseHash = %A" sparseHash
+        sparseHash
+        |> Array.chunkBySize 16
+        |> Array.map ( fun chunk -> chunk |> Array.fold (^^^) 0 )
 
+    let computeKnotHash denseHash =
+        if debug then printfn "denseHash = %A" denseHash else ()
+        let toHex (x:int) = x.ToString("x2")
+        denseHash |> Array.map toHex |> String.concat ""
 
-Question2.length |> printfn "%A"
+    let answer () = input |> computeSparseHash |> computeDenseHash |> computeKnotHash
+
+Question2.answer () |> printfn "Question 2: %A"
